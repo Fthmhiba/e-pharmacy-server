@@ -12,6 +12,7 @@ import offercardRoutes from "./routes/offercardRoutes.js"
 import blogRoutes from "./routes/blogRoutes.js"
 import wishlistRoutes from "./routes/wishlistRoutes.js"
 import cardRoutes from "./routes/cardRoutes.js"
+import orderRoutes from "./routes/orderRoutes.js"
 import couponRoutes from "./routes/couponRoutes.js"
 
 
@@ -40,6 +41,7 @@ app.use('/api/blogs', blogRoutes)
 app.use('/api/banner', bannerRoutes)
 app.use('/api/banner2', banner2Routes)
 
+app.use('/api/order', orderRoutes)
 app.use('/api/cart', cartRoutes)
 app.use('/api/wishlist', wishlistRoutes)
 

@@ -1,10 +1,7 @@
 import mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema({
-    orderId: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: [true, "Please add the Order Id"]
-    },
+
     productId: {
         type: mongoose.Schema.Types.ObjectId,
         required: [true, "Please add the product id"]
@@ -17,9 +14,21 @@ const orderSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         required: [true, "Please add the product id"]
     },
+    paymentId: {
+        type: mongoose.Schema.Types.ObjectId,
+        // required: [true, "Please add the product id"]
+    },
     mode: {
         type: String,
         required: [true, "Please add the mode "]
+    },
+    status: {
+        type: String,
+        enum: ["pending", "shipped","accepted","approved", "delivered"],
+        default: "pending",
+    },
+    productsArray: {
+        type:Array
     }
 },
     {

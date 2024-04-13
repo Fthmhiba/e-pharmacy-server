@@ -117,38 +117,19 @@ export const removeCartQuantity = async (req, res) => {
 
 export const decrementCartQuantity = async (req, res) => {
     try {
+        const cartItem = await Cart.findOneAndUpdate(
+            { productId: new mongoose.Types.ObjectId(req.params.productId),userId:new mongoose.Types.ObjectId(req.params.userId) }, // Assuming req.user contains the user's ID
+            { $inc: { quantity: -1 } }, // Increment quantity by 1
+            { new: true } // Return the updated document
+        );
 
-        if (!req.params.productId) return res.status(400).json({ message: "product id not provided" })
-        if (!req.params.userId) return res.status(400).json({ message: "user id not provided" })
-
-        const isExistProduct = await Cart.findOne({
-            productId: new mongoose.Types.ObjectId(req.params.productId),
-            userId: new mongoose.Types.ObjectId(req.params.userId)
-        })
-
-        if (isExistProduct.quantity === 0) {
-            const saveData = await Cart.findByIdAndDelete(isExistProduct._id)
-            return res.status(201).json({ message: 'remove from cart' });
-
+        if (!cartItem) {
+            return res.status(404).json({ message: 'Cart item not found' });
         }
 
-
-        if (isExistProduct) {
-            const copy = { ...isExistProduct._doc }
-
-            copy.quantity = copy.quantity - 1
-            const saveData = await Cart.findByIdAndUpdate(isExistProduct._id, { $set: copy }, { new: true })
-            return res.status(201).json({ result: saveData, message: 'incremented' });
-
-        } else {
-
-            return res.status(400).json({ message: 'cart not exist' });
-        }
-
-
-    }
-    catch (error) {
-        return res.status(404).json({ message: error.message || 'error' });
+        return res.status(200).json({ result: cartItem, message: 'Quantity incremented successfully' });
+    } catch (error) {
+        return res.status(500).json({ message: error.message || 'Internal server error' });
     }
 };
 
@@ -156,30 +137,18 @@ export const decrementCartQuantity = async (req, res) => {
 export const incrementCartQuantity = async (req, res) => {
 
     try {
+        const cartItem = await Cart.findOneAndUpdate(
+            { productId: new mongoose.Types.ObjectId(req.params.productId),userId:new mongoose.Types.ObjectId(req.params.userId) }, // Assuming req.user contains the user's ID
+            { $inc: { quantity: 1 } }, // Increment quantity by 1
+            { new: true } // Return the updated document
+        );
 
-        if(!req.params.productId) return res.status(400).json({message:"product id not provided"})
-        if(!req.params.userId) return res.status(400).json({message:"user id not provided"})
-
-        const isExistProduct = await Cart.findOne({productId:new mongoose.Types.ObjectId(req.params.productId),
-            userId:new mongoose.Types.ObjectId(req.params.userId)
-        })
-
-
-        if(isExistProduct){
-            const copy =  {...isExistProduct._doc}
-
-            copy.quantity  = copy.quantity+1
-            const saveData = await Cart.findByIdAndUpdate(isExistProduct._id,{$set:copy},{new:true})
-            return res.status(201).json({ result: saveData, message: 'incremented' });
-
-        }else{
-
-            return res.status(400).json({  message: 'cart not exist' });
+        if (!cartItem) {
+            return res.status(404).json({ message: 'Cart item not found' });
         }
 
-
-        }
-        catch (error) {
-            return res.status(404).json({ message: error.message || 'error' });
-        }
+        return res.status(200).json({ result: cartItem, message: 'Quantity incremented successfully' });
+    } catch (error) {
+        return res.status(500).json({ message: error.message || 'Internal server error' });
+    }
 };
