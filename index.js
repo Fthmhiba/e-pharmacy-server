@@ -38,6 +38,8 @@ app.use('/api/cards', cardRoutes)
 app.use('/api/coupons', couponRoutes)
 
 app.use('/api/blogs', blogRoutes)
+// app.use('/api/blogs2', blog2Routes)
+
 app.use('/api/banner', bannerRoutes)
 app.use('/api/banner2', banner2Routes)
 

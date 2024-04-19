@@ -75,27 +75,27 @@ export const getById = async (req, res) => {
 
 export const getAll = async (req, res) => {
     // console.log(req.params.id, 'req.body.userId');
-   try {
-    const getAll = await Cart.aggregate([
-    
-        {
-            $lookup: {
-                from: "products",
-                localField: "productId",
-                foreignField: "_id",
-                as: "productInfo"
-            }
-        },
-        {
-            $unwind: "$productInfo"
-        },
-    ])
+    try {
+        const getAll = await Cart.aggregate([
 
-        return res.status(200).json({ result : getAll });
-   } catch (error) {
+            {
+                $lookup: {
+                    from: "products",
+                    localField: "productId",
+                    foreignField: "_id",
+                    as: "productInfo"
+                }
+            },
+            {
+                $unwind: "$productInfo"
+            },
+        ])
+
+        return res.status(200).json({ result: getAll });
+    } catch (error) {
         console.log(error);
-   }
-    
+    }
+
 }
 
 export const removeCartQuantity = async (req, res) => {
@@ -118,7 +118,7 @@ export const removeCartQuantity = async (req, res) => {
 export const decrementCartQuantity = async (req, res) => {
     try {
         const cartItem = await Cart.findOneAndUpdate(
-            { productId: new mongoose.Types.ObjectId(req.params.productId),userId:new mongoose.Types.ObjectId(req.params.userId) }, // Assuming req.user contains the user's ID
+            { productId: new mongoose.Types.ObjectId(req.params.productId), userId: new mongoose.Types.ObjectId(req.params.userId) }, // Assuming req.user contains the user's ID
             { $inc: { quantity: -1 } }, // Increment quantity by 1
             { new: true } // Return the updated document
         );
@@ -137,17 +137,26 @@ export const decrementCartQuantity = async (req, res) => {
 export const incrementCartQuantity = async (req, res) => {
 
     try {
-        const cartItem = await Cart.findOneAndUpdate(
-            { productId: new mongoose.Types.ObjectId(req.params.productId),userId:new mongoose.Types.ObjectId(req.params.userId) }, // Assuming req.user contains the user's ID
-            { $inc: { quantity: 1 } }, // Increment quantity by 1
-            { new: true } // Return the updated document
-        );
+        if (!req.params.productId) return res.status(400).json({ message: "product id not provided" })
+        if (!req.params.userId) return res.status(400).json({ message: "user id not provided" })
 
-        if (!cartItem) {
-            return res.status(404).json({ message: 'Cart item not found' });
+        const isExistProduct = await Cart.findOne({
+            productId: new mongoose.Types.ObjectId(req.params.productId),
+            userId: new mongoose.Types.ObjectId(req.params.userId)
+        })
+
+
+        if (isExistProduct) {
+            const copy = { ...isExistProduct._doc }
+
+            copy.quantity = copy.quantity + 1
+            const saveData = await Cart.findByIdAndUpdate(isExistProduct._id, { $set: copy }, { new: true })
+            return res.status(201).json({ result: saveData, message: 'incremented' });
+
+        } else {
+
+            return res.status(400).json({ message: 'cart not exist' });
         }
-
-        return res.status(200).json({ result: cartItem, message: 'Quantity incremented successfully' });
     } catch (error) {
         return res.status(500).json({ message: error.message || 'Internal server error' });
     }
