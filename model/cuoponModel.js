@@ -15,6 +15,9 @@ const couponSchema = new mongoose.Schema({
     offerRate: {
         type: String,
     },
+    code: {
+        type: String,
+    },
     
 },
     {
